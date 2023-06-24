@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import {firebaseAdmin} from '@/lib/firebaseAdmin'
 import axios from 'axios';
 import qs from "qs";
+import { IncomingWebhook } from '@slack/webhook';
 
 const SLACK_API_URL = 'https://slack.com/api';
 
@@ -11,17 +12,26 @@ export default async function handler(
   res: NextApiResponse
 ) {
     const { token, trigger_id, user, actions, type, container, view } = req.body.payload
-    const db = firebaseAdmin.firestore()
     if (req.method === 'POST') {
-        // const docRef = db.collection(COLLECTION_NAME).doc();
+        const webhook = new IncomingWebhook('https://hooks.slack.com/services/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');
+        await webhook.send({
+            text: `
+actions: ${JSON.stringify(actions)}
+args: ${JSON.stringify({
+    token: process.env.SLACK_BOT_TOKEN,
+    trigger_id: trigger_id,
+})}
+`
+        })
         if (actions && actions[0].action_id.match(/open-modal-button/)) {
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
                 view: JSON.stringify(MODAL_TEMPLATE)
-              };
-              await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
+            };
+            await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
+            const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
             await docRef.set({
                 text: view.state.values['replay-message'].content.value!== undefined ? view.state.values['replay-message'].content.value :"",
