@@ -42,7 +42,6 @@ export const useAuth: UseAuth = () => {
     }
     return `${process.env.NEXT_PUBLIC_APP_URL}`;
   }, [router.query]);
-  console.log(redirectUrl)
   useEffect(() => {
     (async () => {
       if (router.isReady) {
