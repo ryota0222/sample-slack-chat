@@ -16,6 +16,7 @@ export default async function handler(
         const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
         await webhook.send({
             text: `
+body: ${JSON.stringify(req.body)},
 actions: ${JSON.stringify(actions)}
 args: ${JSON.stringify({
     token: process.env.SLACK_BOT_TOKEN,
