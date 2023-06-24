@@ -17,8 +17,6 @@ export default async function handler(
     const db = firebaseAdmin.firestore()
         const docRef = db.collection(COLLECTION_NAME).doc(userId);
         const result = await docRef.get();
-        console.log('result======================')
-        console.log(result.data())
         if (result.exists) {
             res.status(200).json(result.data() as IUser)
         } else {

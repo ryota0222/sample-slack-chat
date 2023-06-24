@@ -9,7 +9,6 @@ export const UserProfile: React.FC = memo(() => {
     queryKey: ["users", session.data?.user.uid],
     queryFn: () => getProfile(session.data?.user.uid),
   });
-  console.log(data);
   if (data?.data) {
     return (
       <img
