@@ -2,12 +2,7 @@ import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  GithubAuthProvider,
   getAdditionalUserInfo,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  ActionCodeSettings,
 } from "firebase/auth";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -21,7 +16,7 @@ import { firebaseApp } from "@/lib/firebase";
 
 import type { AuthProvider } from "firebase/auth";
 
-type UseAuth = (invitationCode: string | null) => {
+type UseAuth = () => {
   pending: boolean;
   handleGoogleSignIn: () => void;
   handleGoogleSignUp: () => void;
@@ -33,12 +28,10 @@ const NEED_SIGN_UP =
   "アカウントが存在しないか、無効なアカウントです。正しい情報を入力してください";
 const RECOMMEND_SIGN_IN =
   "アカウントの作成ができませんでした。入力情報を確認して再度お試しください";
-const MUST_EMAIL_VERIFIED =
-  "メールアドレスが検証されていません。ご確認いただくか、確認メールの再送をしてください";
 
 const googleProvider = new GoogleAuthProvider();
 
-export const useAuth: UseAuth = (invitationCode) => {
+export const useAuth: UseAuth = () => {
   const [pending, setPending] = useState(false);
   const auth = getAuth(firebaseApp);
   auth.languageCode = "ja";
@@ -49,6 +42,7 @@ export const useAuth: UseAuth = (invitationCode) => {
     }
     return `${process.env.NEXT_PUBLIC_APP_URL}`;
   }, [router.query]);
+  console.log(redirectUrl)
   useEffect(() => {
     (async () => {
       if (router.isReady) {
@@ -83,9 +77,9 @@ export const useAuth: UseAuth = (invitationCode) => {
             throw new Error(NEED_SIGN_UP);
           }
           return {
-            signInMethod: "sns",
             refreshToken: credential.user.refreshToken,
             idToken,
+            uid: credential.user.uid,
           };
         })
         .then((result) => {
@@ -142,16 +136,12 @@ export const useAuth: UseAuth = (invitationCode) => {
         .then(async ({ credential }) => {
           const idToken = await credential.user.getIdToken(true);
           try {
-            // await client.v1.companies.auth.$post({
-            //   body: {
-            //     invitation_code: invitationCode || "",
-            //   },
-            //   config: {
-            //     headers: {
-            //       Authorization: `Bearer ${idToken}`,
-            //     },
-            //   },
-            // });
+            await client.post('/api/users', {
+              name: credential.user.displayName,
+              avatar: credential.user.photoURL,
+              id: credential.user.uid,
+              webhookUrl: '',
+            })
           } catch (error) {
             credential.user.delete();
             if (error instanceof Error) {
@@ -159,9 +149,9 @@ export const useAuth: UseAuth = (invitationCode) => {
             }
           }
           return {
-            signInMethod: "sns",
             refreshToken: credential.user.refreshToken,
             idToken,
+            uid: credential.user.uid,
           };
         })
         .then((result) => {

@@ -58,11 +58,11 @@ export const authOptions = {
   providers: [
     CredentialsProvider({
       authorize: async (credentials) => {
-        const { idToken, refreshToken, signInMethod } = credentials;
+        const { idToken, refreshToken } = credentials;
         if (idToken != null) {
           try {
             const decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
-            return { ...decoded, idToken, refreshToken, signInMethod };
+            return { ...decoded, idToken, refreshToken };
           } catch (error) {}
         }
         return null;
@@ -76,7 +76,7 @@ export const authOptions = {
       if (user) {
         token.accessToken = user.idToken;
         token.refreshToken = user.refreshToken;
-        token.signInMethod = user.signInMethod;
+        token.uid = user.uid;
         token.accessTokenExpires = user.exp;
         return token;
       }
@@ -91,7 +91,7 @@ export const authOptions = {
     async session({ session, token }) {
       session.user.accessToken = token.accessToken;
       session.user.refreshToken = token.refreshToken;
-      session.user.signInMethod = token.signInMethod;
+      session.user.uid = token.uid;
       session.user.accessTokenExpires = token.accessTokenExpires;
       return session;
     },

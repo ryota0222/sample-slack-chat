@@ -11,12 +11,20 @@ const axios = Axios.create({
     encode: parse as any,
     serialize: (params) => qs.stringify(params, { arrayFormat: "brackets" }),
   },
-  headers: {
-    "X-API-KEY": process.env.NEXT_PUBLIC_X_API_KEY,
-  },
 });
 
 const NO_TOAST_ENDPOINT_LIST = [""];
+
+axios.interceptors.request.use(
+  async (config) => {
+    if (!config.headers['Authorization']) {
+      const session = await getSession()
+      config.headers['Authorization'] = `Bearer ${session?.user.accessToken}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
 axios.interceptors.response.use(
   (response) => {
