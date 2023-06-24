@@ -65,7 +65,7 @@ ${text}`,
                             accessory: {
                                 type: "button",
                                 text: { type: "plain_text", "text": "モーダルを開いて返信" },
-                                value: "clicked",
+                                value: JSON.stringify({uid: userId}),
                                 // # この action_id を @app.action リスナーで指定します
                                 action_id: "open-modal-button",
                             },

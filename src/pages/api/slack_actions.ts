@@ -14,7 +14,7 @@ export default async function handler(
     const db = firebaseAdmin.firestore()
     if (req.method === 'POST') {
         // const docRef = db.collection(COLLECTION_NAME).doc();
-        if(actions && actions[0].action_id.match(/add_data/)) {
+        if (actions && actions[0].action_id.match(/open-modal-button/)) {
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
@@ -26,7 +26,7 @@ export default async function handler(
             await docRef.set({
                 text: view.state.values['replay-message'].content.value!== undefined ? view.state.values['replay-message'].content.value :"",
                 createdAt: new Date(),
-                uid: user.id
+                uid: JSON.stringify(view)
             });
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
