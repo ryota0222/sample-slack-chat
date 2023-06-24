@@ -13,7 +13,7 @@ export default async function handler(
 ) {
     const { token, trigger_id, user, actions, type, container, view } = req.body.payload
     if (req.method === 'POST') {
-        const webhook = new IncomingWebhook('https://hooks.slack.com/services/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');
+        const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
         await webhook.send({
             text: `
 actions: ${JSON.stringify(actions)}
