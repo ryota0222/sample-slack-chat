@@ -52,6 +52,25 @@ export default async function handler(
                 await webhook.send({
                     username: user.name,
                     icon_url: user.avatar,
+                    blocks: [
+                        {
+                            type: "section",
+                            block_id: "button-block",
+                            text: {
+                                type: "mrkdwn",
+                                "text": `${user.name}さんからメッセージが届きました。
+メッセージ：
+${text}`,
+                            },
+                            accessory: {
+                                type: "button",
+                                text: { type: "plain_text", "text": "モーダルを開いて返信" },
+                                value: "clicked",
+                                // # この action_id を @app.action リスナーで指定します
+                                action_id: "open-modal-button",
+                            },
+                        }
+                    ],
                     text: `${user.name}さんからメッセージが届きました。
 メッセージ：
 ${text}`,
