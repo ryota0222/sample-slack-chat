@@ -17,26 +17,26 @@ export default async function handler(
 ) {
     const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
-
     if (req.method === 'POST') {
         if (actions &&
             actions[0].action_id.indexOf(PATTERN) === 0) {
-            await webhook.send({
-                text: `
-${JSON.stringify(JSON.parse(req.body.payload))}
-`
-            })
+                await webhook.send({
+                    text: `
+                    ${JSON.stringify(JSON.parse(req.body.payload))}
+                    `
+                })
+            const uid = actions[0].action_id.slice(PATTERN.length)
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
-                view: getModalTemplate(message.blocks[0].accessory.value)
+                view: getModalTemplate(JSON.stringify({uid}))
             };
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
             // NOTE: pass!
+            const {uid} = JSON.parse(view.private_metadata)
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
-            const uid = actions[0].action_id.slice(PATTERN.length)
             const fromUserDocRef = db.collection('users').doc(TARGET_USER_ID)
             const toUserDocRef = db.collection('users').doc(uid)
             const text = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
