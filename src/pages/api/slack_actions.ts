@@ -17,6 +17,9 @@ export default async function handler(
 ) {
     const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
+    webhook.send({
+        text: `token: ${token}`
+    })
     if (req.method === 'POST') {
         if (actions &&
             actions[0].action_id.indexOf(PATTERN) === 0) {
