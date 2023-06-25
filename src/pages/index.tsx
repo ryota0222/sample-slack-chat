@@ -5,6 +5,7 @@ import { WebhookForm } from "@/components/features/WebhookForm";
 import { MessageForm } from "@/components/features/MessageForm";
 import { MessageContent } from "@/components/features/MessageContent";
 import Link from "next/link";
+import { BotTokenForm } from "@/components/features/BotTokenForm";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ const Home = () => {
       {status === "authenticated" && (
         <div className="grid grid-cols-1 divide-y divide-slate-600 w-full">
           <WebhookForm />
+          <BotTokenForm />
           <MessageForm />
           <MessageContent />
         </div>
