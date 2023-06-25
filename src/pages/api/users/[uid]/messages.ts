@@ -44,7 +44,8 @@ export default async function handler(
             text,
             createdAt: new Date(),
             from: fromUserDocRef,
-            uid: userId,
+            senderId: userId,
+            receiverId: 'sample',
             to: toUserDocRef
         });
         // slackに通知

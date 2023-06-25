@@ -5,7 +5,8 @@ export interface IMessage {
     from: IUser
     to: IUser
     createdAt: string
-    uid: string
+    senderId: string
+    receiverId: string
 }
 
 export interface IPostMessageRequest {

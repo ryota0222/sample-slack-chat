@@ -37,7 +37,8 @@ export default async function handler(
             void docRef.set({
                 text,
                 createdAt: new Date(),
-                uid: TARGET_USER_ID,
+                senderId: TARGET_USER_ID,
+                receiverId: uid,
                 to: toUserDocRef,
                 from: fromUserDocRef
             });
