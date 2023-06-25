@@ -24,14 +24,14 @@ export default async function handler(
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
             // NOTE: pass!
-            const db = firebaseAdmin.firestore()
-            const docRef = db.collection('messages').doc();
-            void docRef.set({
-                text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
-                createdAt: new Date(),
-                uid: 'sample',
-                to: ''
-            });
+            // const db = firebaseAdmin.firestore()
+            // const docRef = db.collection('messages').doc();
+            // void docRef.set({
+            //     text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
+            //     createdAt: new Date(),
+            //     uid: 'sample',
+            //     to: ''
+            // });
             // NOTE: pass!
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
