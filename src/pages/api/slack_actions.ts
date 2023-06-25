@@ -71,7 +71,7 @@ ${text}
 }
 
 const getModalTemplate = (metadata: string) => {
-    return {
+    return JSON.stringify({
         "type": "modal",
         "title": {
             "type": "plain_text",
@@ -105,6 +105,5 @@ const getModalTemplate = (metadata: string) => {
                 }
             }
         ]
-    }
+    })
 }
-
