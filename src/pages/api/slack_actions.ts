@@ -4,6 +4,7 @@ import { firebaseAdmin } from '@/lib/firebaseAdmin'
 import axios from 'axios';
 import qs from "qs";
 import { IncomingWebhook } from '@slack/webhook';
+import { IUser } from '@/components/features/User/types';
 
 const SLACK_API_URL = 'https://slack.com/api';
 
@@ -17,20 +18,23 @@ export default async function handler(
 ) {
     const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
-    
+    const db = firebaseAdmin.firestore()
     if (req.method === 'POST') {
         if (actions &&
             actions[0].action_id.indexOf(PATTERN) === 0) {
             const uid = actions[0].action_id.slice(PATTERN.length)
-            const args = {
-                token: process.env.SLACK_BOT_TOKEN,
-                trigger_id: trigger_id,
-                view: getModalTemplate(JSON.stringify({uid}))
-            };
-            await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
+            const userDocRef = db.collection('users').doc(uid)
+            const doc = await userDocRef.get()
+            if (doc.exists) {
+                const args = {
+                    token: (doc.data() as IUser).botToken,
+                    trigger_id: trigger_id,
+                    view: getModalTemplate(JSON.stringify({uid}))
+                };
+                await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
+            }
         } else if (type === 'view_submission') {
             const {uid} = JSON.parse(view.private_metadata)
-            const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
             const fromUserDocRef = db.collection('users').doc(TARGET_USER_ID)
             const toUserDocRef = db.collection('users').doc(uid)

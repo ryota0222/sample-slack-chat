@@ -52,7 +52,7 @@ export default async function handler(
         const fromUserDoc = await fromUserDocRef.get();
         if (fromUserDoc.exists) {
             const from = fromUserDoc.data() as IUser
-            if (from.webhook?.length) {
+            if (from.webhook?.length && from.botToken?.length) {
                 const webhook = new IncomingWebhook(from.webhook);
                 await webhook.send({
                     username: from.name,

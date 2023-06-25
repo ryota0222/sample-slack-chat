@@ -25,7 +25,7 @@ export default async function handler(
          * 更新時
          */
         const docRef = db.collection('users').doc(userId);
-        const result = await docRef.update({
+        await docRef.update({
             avatar,
             name,
             webhook: typeof webhookUrl === 'string' ? webhookUrl : ''
@@ -36,7 +36,7 @@ export default async function handler(
          * 登録時
          */
         const docRef = db.collection('users').doc(userId);
-        const result = await docRef.set({
+        await docRef.set({
             avatar,
             name,
             webhook: typeof webhookUrl === 'string' ? webhookUrl : ''
