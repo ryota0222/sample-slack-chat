@@ -12,7 +12,11 @@ const Home = () => {
   return (
     <main className={`flex flex-col items-center px-24 ${inter.className}`}>
       {/* ローディング中 */}
-      {status === "loading" && <Loader />}
+      {status === "loading" && (
+        <div className="w-full py-12">
+          <Loader />
+        </div>
+      )}
       {/* 認証時 */}
       {status === "authenticated" && (
         <div className="grid grid-cols-1 divide-y divide-slate-600 w-full">
