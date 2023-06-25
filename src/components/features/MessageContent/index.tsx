@@ -7,6 +7,7 @@ export const MessageContent: React.FC = memo(() => {
   const { data, isLoading } = useFetchMessages({
     config: {
       refetchOnWindowFocus: true,
+      staleTime: 10000,
     },
   });
   return (
