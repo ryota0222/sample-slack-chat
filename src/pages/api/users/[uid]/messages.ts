@@ -69,12 +69,8 @@ ${text}`,
                             accessory: {
                                 type: "button",
                                 text: { type: "plain_text", "text": "モーダルを開いて返信" },
-                                action_id: "open-modal-button",
+                                action_id: `open-modal-button_${userId}`,
                                 style: 'primary',
-                                value: JSON.stringify({
-                                    uid: userId,
-                                    username: from.name,
-                                })
                             },
                         }
                     ],

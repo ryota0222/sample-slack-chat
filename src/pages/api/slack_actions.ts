@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import {firebaseAdmin} from '@/lib/firebaseAdmin'
+import { firebaseAdmin } from '@/lib/firebaseAdmin'
 import axios from 'axios';
 import qs from "qs";
 import { IncomingWebhook } from '@slack/webhook';
@@ -9,15 +9,18 @@ const SLACK_API_URL = 'https://slack.com/api';
 
 const TARGET_USER_ID = 'sample'
 
+const PATTERN = 'open-modal-button_'
+
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+    req: NextApiRequest,
+    res: NextApiResponse
 ) {
     const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
-    
+
     if (req.method === 'POST') {
-        if (actions && actions[0].action_id === 'open-modal-button') {
+        if (actions &&
+            actions[0].action_id.indexOf(PATTERN) === 0) {
             await webhook.send({
                 text: `
 ${JSON.stringify(JSON.parse(req.body.payload))}
@@ -33,10 +36,9 @@ ${JSON.stringify(JSON.parse(req.body.payload))}
             // NOTE: pass!
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
-            const {uid} = JSON.parse(view.private_metadata)
+            const uid = actions[0].action_id.slice(PATTERN.length)
             const fromUserDocRef = db.collection('users').doc(TARGET_USER_ID)
             const toUserDocRef = db.collection('users').doc(uid)
-            
             const text = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
             void docRef.set({
                 text,
