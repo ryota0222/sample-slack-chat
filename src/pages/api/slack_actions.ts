@@ -17,7 +17,6 @@ export default async function handler(
     res: NextApiResponse
 ) {
     const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
-    const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
     const db = firebaseAdmin.firestore()
     if (req.method === 'POST') {
         if (actions &&
@@ -26,8 +25,9 @@ export default async function handler(
             const userDocRef = db.collection('users').doc(uid)
             const doc = await userDocRef.get()
             if (doc.exists) {
+                const docData = (doc.data() as IUser)
                 const args = {
-                    token: (doc.data() as IUser).botToken,
+                    token: docData.botToken,
                     trigger_id: trigger_id,
                     view: getModalTemplate(JSON.stringify({uid}))
                 };
@@ -38,6 +38,8 @@ export default async function handler(
             const docRef = db.collection('messages').doc();
             const fromUserDocRef = db.collection('users').doc(TARGET_USER_ID)
             const toUserDocRef = db.collection('users').doc(uid)
+            const doc = await toUserDocRef.get()
+            const webhook = new IncomingWebhook((doc.data() as IUser).webhook);
             const text = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
             void docRef.set({
                 text,
