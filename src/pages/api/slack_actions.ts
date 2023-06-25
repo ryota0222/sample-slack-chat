@@ -18,7 +18,7 @@ export default async function handler(
         if (actions && actions[0].action_id === 'open-modal-button') {
             await webhook.send({
                 text: `
-${JSON.parse(req.body.payload)}
+${JSON.stringify(JSON.parse(req.body.payload))}
 `
             })
             const args = {
