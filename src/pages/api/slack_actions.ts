@@ -26,6 +26,13 @@ export default async function handler(
                     `
                 })
             const uid = actions[0].action_id.slice(PATTERN.length)
+            await webhook.send({
+                text: `
++++++++++++++++++++++++++++++++
+    uid: ${uid}
++++++++++++++++++++++++++++++++
+                `
+            })
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
