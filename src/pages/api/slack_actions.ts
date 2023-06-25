@@ -11,7 +11,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-    const { token, trigger_id, user, actions, type, container, view } = req.body.payload
+    const { token, trigger_id, user, actions, type, container, view } = JSON.parse(req.body.payload)
     if (req.method === 'POST') {
         const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
         await webhook.send({
@@ -24,7 +24,7 @@ args: ${JSON.stringify({
 })}
 `
         })
-        if (actions && actions[0].action_id.match(/open-modal-button/)) {
+        if (actions && actions[0].action_id === 'open-modal-button') {
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
