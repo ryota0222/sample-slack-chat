@@ -64,12 +64,13 @@ ${text}`,
                             accessory: {
                                 type: "button",
                                 text: { type: "plain_text", "text": "モーダルを開いて返信" },
-                                // # この action_id を @app.action リスナーで指定します
                                 action_id: "open-modal-button",
+                                style: 'primary',
+                                value: userId
                             },
                         }
                     ],
-                    text: `${user.name}さんからメッセージが届きました。
+                    text: `*${user.name}さんからメッセージが届きました。*
 メッセージ：
 ${text}`,
                 });

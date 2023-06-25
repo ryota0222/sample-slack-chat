@@ -16,6 +16,11 @@ export default async function handler(
     
     if (req.method === 'POST') {
         if (actions && actions[0].action_id === 'open-modal-button') {
+            await webhook.send({
+                text: `
+${JSON.parse(req.body.payload)}
+`
+            })
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
@@ -27,31 +32,20 @@ export default async function handler(
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
             const userDocRef = db.collection('users').doc('sample')
+            const message = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
             void docRef.set({
-                text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
+                text: message,
                 createdAt: new Date(),
                 uid: 'sample',
                 to: '',
                 user: userDocRef
             });
-            // NOTE: pass!
-            const args = {
-                token: process.env.SLACK_BOT_TOKEN,
-                view_id: view.id,
-                view: JSON.stringify(MODAL_COMPLETE_TEMPLATE)
-            };
             await webhook.send({
-                text: JSON.stringify(args)
+                text: `以下のメッセージを送信しました！
+メッセージ：
+${message}
+`
             })
-            // try {
-            //     await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
-            // }catch (err) {
-            //     if (err instanceof Error) {
-            //         await webhook.send({
-            //             text: JSON.stringify(err.message)
-            //         })
-            //     }
-            // }
             return res.status(200).json({
                 "response_action": "clear"
             })
@@ -95,31 +89,4 @@ const MODAL_TEMPLATE = {
 			}
 		}
 	]
-}
-
-const MODAL_COMPLETE_TEMPLATE = {
-    "title": {
-        "type": "plain_text",
-        "text": "Complete!",
-        "emoji": true
-    },
-    "type": "modal",
-    "blocks": [
-        {
-            "type": "context",
-            "elements": [
-                {
-                    "type": "plain_text",
-                    "text": "メッセージを送信しました",
-                    "emoji": true
-                }
-            ]
-        }
-    ],
-    "submit": null,
-    "close": {
-        "type": "plain_text",
-        "text": "Cancel",
-        "emoji": true
-    }
 }
