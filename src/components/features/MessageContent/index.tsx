@@ -1,5 +1,4 @@
-import React, { memo, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import React, { memo } from "react";
 import { useFetchMessages } from "../Message/hooks/useFetchMessages";
 import { Loader } from "@/components/ui/Loader";
 import dayjs from "@/lib/dayjs";
@@ -20,13 +19,13 @@ export const MessageContent: React.FC = memo(() => {
               {data.data.map((message, idx) => (
                 <div key={`message-${idx}`} className="flex gap-4 py-4">
                   <img
-                    src={message.user.avatar}
+                    src={message.from.avatar}
                     alt="profile image"
                     className="w-12 h-12 rounded-full"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">{message.user.name}</span>
+                      <span className="font-bold">{message.from.name}</span>
                       <span className="text-sm text-slate-400">
                         {dayjs(message.createdAt).format("YYYY/MM/DD HH:mm")}
                       </span>
