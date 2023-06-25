@@ -4,6 +4,8 @@ export interface IMessage {
     text: string
     user: IUser
     createdAt: string
+    uid: string
+    to: string
 }
 
 export interface IPostMessageRequest {

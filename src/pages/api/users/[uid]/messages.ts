@@ -39,7 +39,8 @@ export default async function handler(
             text,
             createdAt: new Date(),
             user: userDocRef,
-            uid: userId
+            uid: userId,
+            to: 'sample'
         });
         // slackに通知
         const userDoc = await userDocRef.get();

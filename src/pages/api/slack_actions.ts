@@ -13,17 +13,6 @@ export default async function handler(
 ) {
     const { token, trigger_id, user, actions, type, container, view } = JSON.parse(req.body.payload)
     if (req.method === 'POST') {
-        const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
-        await webhook.send({
-            text: `
-body: ${JSON.stringify(req.body)},
-actions: ${JSON.stringify(actions)}
-args: ${JSON.stringify({
-    token: process.env.SLACK_BOT_TOKEN,
-    trigger_id: trigger_id,
-})}
-`
-        })
         if (actions && actions[0].action_id === 'open-modal-button') {
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
@@ -34,10 +23,11 @@ args: ${JSON.stringify({
         } else if (type === 'view_submission') {
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
-            await docRef.set({
-                text: view.state.values['replay-message'].content.value!== undefined ? view.state.values['replay-message'].content.value :"",
+            void docRef.set({
+                text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
                 createdAt: new Date(),
-                uid: JSON.stringify(view)
+                uid: 'sample',
+                to: ''
             });
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
