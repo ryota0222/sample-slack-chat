@@ -4,7 +4,11 @@ import { Loader } from "@/components/ui/Loader";
 import dayjs from "@/lib/dayjs";
 
 export const MessageContent: React.FC = memo(() => {
-  const { data, isLoading } = useFetchMessages();
+  const { data, isLoading } = useFetchMessages({
+    config: {
+      refetchOnWindowFocus: true,
+    },
+  });
   return (
     <div className="w-full py-12">
       <h2 className="mb-4 text-xl font-bold"># メッセージ内容</h2>

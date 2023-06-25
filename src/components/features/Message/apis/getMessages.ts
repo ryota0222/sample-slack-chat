@@ -1,7 +1,7 @@
 import client from '@/lib/axios'
 import { IMessage } from '../types'
 
-export const getMessages = (id?: string) => {
+export const getMessages = async (id?: string) => {
     if (!id) return null
-    return client.get<IMessage[]>(`/api/users/${id}/messages`)
+    return await client.get<IMessage[]>(`/api/users/${id}/messages`)
 }
