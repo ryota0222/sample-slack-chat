@@ -33,10 +33,18 @@ export default async function handler(
             //     to: ''
             // });
             // NOTE: pass!
+            webhook.send({
+                text: `{
+    text: ${view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""},
+    createdAt: ${new Date()},
+    uid: 'sample',
+    to: ''
+}`
+            })
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 view_id: view.id,
-                view: MODAL_COMPLETE_TEMPLATE
+                view: JSON.stringify(MODAL_COMPLETE_TEMPLATE)
             };
             await webhook.send({
                 text: JSON.stringify(args)
