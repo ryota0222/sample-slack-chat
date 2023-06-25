@@ -24,14 +24,14 @@ export default async function handler(
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
             // NOTE: pass!
-            // const db = firebaseAdmin.firestore()
-            // const docRef = db.collection('messages').doc();
-            // void docRef.set({
-            //     text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
-            //     createdAt: new Date(),
-            //     uid: 'sample',
-            //     to: ''
-            // });
+            const db = firebaseAdmin.firestore()
+            const docRef = db.collection('messages').doc();
+            void docRef.set({
+                text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
+                createdAt: new Date(),
+                uid: 'sample',
+                to: ''
+            });
             // NOTE: pass!
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
@@ -41,7 +41,15 @@ export default async function handler(
             await webhook.send({
                 text: JSON.stringify(args)
             })
-            await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
+            try {
+                await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
+            }catch (err) {
+                if (err instanceof Error) {
+                    await webhook.send({
+                        text: JSON.stringify(err.message)
+                    })
+                }
+            }
         }
         res.status(200)
     } else {
