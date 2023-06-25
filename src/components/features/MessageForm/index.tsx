@@ -38,7 +38,7 @@ export const MessageForm: React.FC = memo(() => {
     <div className="w-full py-12">
       <h2 className="mb-4 text-xl font-bold"># メッセージ送信</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex items-end gap-4">
+        <div className="flex items-end">
           <textarea
             id="message"
             {...register("message")}
@@ -47,7 +47,7 @@ export const MessageForm: React.FC = memo(() => {
           />
           <button
             type="submit"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium hover:bg-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 text-white w-20"
+            className="inline-flex ml-4 justify-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium hover:bg-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 text-white w-20"
             disabled={mutation.isLoading}
           >
             送信
