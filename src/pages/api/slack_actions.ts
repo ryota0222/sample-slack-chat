@@ -33,14 +33,6 @@ export default async function handler(
             //     to: ''
             // });
             // NOTE: pass!
-            webhook.send({
-                text: `{
-    text: ${view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""},
-    createdAt: ${new Date()},
-    uid: 'sample',
-    to: ''
-}`
-            })
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 view_id: view.id,
@@ -93,27 +85,28 @@ const MODAL_TEMPLATE = {
 }
 
 const MODAL_COMPLETE_TEMPLATE = {
-        "title": {
-            "type": "plain_text",
-            "text": "Complete!",
-            "emoji": true
-        },
-        "type": "modal",
-        "blocks": [
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": "メッセージを送信しました",
-                        "emoji": true
-                    }
-                ]
-            }
-        ],
-        "close": {
-            "type": "plain_text",
-            "text": "Cancel",
-            "emoji": true
+    "title": {
+        "type": "plain_text",
+        "text": "Complete!",
+        "emoji": true
+    },
+    "type": "modal",
+    "blocks": [
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": "メッセージを送信しました",
+                    "emoji": true
+                }
+            ]
         }
+    ],
+    "submit": null,
+    "close": {
+        "type": "plain_text",
+        "text": "Cancel",
+        "emoji": true
     }
+}
