@@ -2,10 +2,10 @@ import { IUser } from "../../User/types"
 
 export interface IMessage {
     text: string
-    user: IUser
+    from: IUser
+    to: IUser
     createdAt: string
     uid: string
-    to: string
 }
 
 export interface IPostMessageRequest {

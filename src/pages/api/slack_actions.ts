@@ -7,11 +7,13 @@ import { IncomingWebhook } from '@slack/webhook';
 
 const SLACK_API_URL = 'https://slack.com/api';
 
+const TARGET_USER_ID = 'sample'
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-    const { token, trigger_id, user, actions, type, container, view } = JSON.parse(req.body.payload)
+    const { token, trigger_id, user, actions, type, container, view, message } = JSON.parse(req.body.payload)
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_URL as string);
     
     if (req.method === 'POST') {
@@ -24,26 +26,29 @@ ${JSON.stringify(JSON.parse(req.body.payload))}
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
-                view: JSON.stringify(MODAL_TEMPLATE)
+                view: getModalTemplate(message.blocks[0].accessory.value)
             };
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
             // NOTE: pass!
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
-            const userDocRef = db.collection('users').doc('sample')
-            const message = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
+            const {uid} = JSON.parse(view.private_metadata)
+            const fromUserDocRef = db.collection('users').doc(TARGET_USER_ID)
+            const toUserDocRef = db.collection('users').doc(uid)
+            
+            const text = view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : ""
             void docRef.set({
-                text: message,
+                text,
                 createdAt: new Date(),
-                uid: 'sample',
-                to: '',
-                user: userDocRef
+                uid: TARGET_USER_ID,
+                to: toUserDocRef,
+                from: fromUserDocRef
             });
             await webhook.send({
                 text: `以下のメッセージを送信しました！
 メッセージ：
-${message}
+${text}
 `
             })
             return res.status(200).json({
@@ -56,37 +61,41 @@ ${message}
     }
 }
 
-const MODAL_TEMPLATE = {
-	"type": "modal",
-	"title": {
-		"type": "plain_text",
-		"text": "Reply",
-		"emoji": true
-	},
-	"submit": {
-		"type": "plain_text",
-		"text": "Submit",
-		"emoji": true
-	},
-	"close": {
-		"type": "plain_text",
-		"text": "Cancel",
-		"emoji": true
-	},
-	"blocks": [
-		{
-			"type": "input",
-            "block_id": "replay-message",
-			"element": {
-				"type": "plain_text_input",
-				"multiline": true,
-				"action_id": "plain_text_input-action"
-			},
-			"label": {
-				"type": "plain_text",
-				"text": "返信を入力してください",
-				"emoji": true
-			}
-		}
-	]
+const getModalTemplate = (metadata: string) => {
+    return {
+        "type": "modal",
+        "title": {
+            "type": "plain_text",
+            "text": "Reply",
+            "emoji": true
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit",
+            "emoji": true
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel",
+            "emoji": true
+        },
+        "private_metadata": metadata,
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "replay-message",
+                "element": {
+                    "type": "plain_text_input",
+                    "multiline": true,
+                    "action_id": "plain_text_input-action"
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "返信を入力してください",
+                    "emoji": true
+                }
+            }
+        ]
+    }
 }
+

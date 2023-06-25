@@ -19,13 +19,17 @@ export default async function handler(
         const querySnapshot = await db.collection('messages').orderBy('createdAt', 'desc').where('uid', '==', userId).get();
         const data = await Promise.all(querySnapshot.docs.map(async doc => {
             const message = doc.data() as IMessage
-            const userDoc = await (message.user as any).get()
-            let user = null
-            if (userDoc.exists) user = userDoc.data() as IUser
+            const fromUserDoc = await (message.from as any).get()
+            const toUserDoc = await (message.to as any).get()
+            let from = null
+            let to = null
+            if (fromUserDoc.exists) from = fromUserDoc.data() as IUser
+            if (toUserDoc.exists) to = toUserDoc.data() as IUser
             return {
                 ...message,
                 createdAt: (message.createdAt as any).toDate(),
-                user
+                from,
+                to
             }
         }));
         res.status(200).json(data)
@@ -34,30 +38,31 @@ export default async function handler(
             return res.status(400).send('メッセージ内容の取得に失敗しました')
         }
         const docRef = db.collection('messages').doc();
-        const userDocRef = db.collection('users').doc(userId);
-        const result = await docRef.set({
+        const fromUserDocRef = db.collection('users').doc(userId);
+        const toUserDocRef = db.collection('users').doc('sample');
+        await docRef.set({
             text,
             createdAt: new Date(),
-            user: userDocRef,
+            from: fromUserDocRef,
             uid: userId,
-            to: 'sample'
+            to: toUserDocRef
         });
         // slackに通知
-        const userDoc = await userDocRef.get();
-        if (userDoc.exists) {
-            const user = userDoc.data() as IUser
-            if (user.webhook?.length) {
-                const webhook = new IncomingWebhook(user.webhook);
+        const fromUserDoc = await fromUserDocRef.get();
+        if (fromUserDoc.exists) {
+            const from = fromUserDoc.data() as IUser
+            if (from.webhook?.length) {
+                const webhook = new IncomingWebhook(from.webhook);
                 await webhook.send({
-                    username: user.name,
-                    icon_url: user.avatar,
+                    username: from.name,
+                    icon_url: from.avatar,
                     blocks: [
                         {
                             type: "section",
                             block_id: "button-block",
                             text: {
                                 type: "mrkdwn",
-                                "text": `${user.name}さんからメッセージが届きました。
+                                "text": `*${from.name}さんからメッセージが届きました。*
 メッセージ：
 ${text}`,
                             },
@@ -66,11 +71,14 @@ ${text}`,
                                 text: { type: "plain_text", "text": "モーダルを開いて返信" },
                                 action_id: "open-modal-button",
                                 style: 'primary',
-                                value: userId
+                                value: JSON.stringify({
+                                    uid: userId,
+                                    username: from.name,
+                                })
                             },
                         }
                     ],
-                    text: `*${user.name}さんからメッセージが届きました。*
+                    text: `*${from.name}さんからメッセージが届きました。*
 メッセージ：
 ${text}`,
                 });
