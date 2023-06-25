@@ -43,15 +43,18 @@ export default async function handler(
             await webhook.send({
                 text: JSON.stringify(args)
             })
-            try {
-                await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
-            }catch (err) {
-                if (err instanceof Error) {
-                    await webhook.send({
-                        text: JSON.stringify(err.message)
-                    })
-                }
-            }
+            // try {
+            //     await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
+            // }catch (err) {
+            //     if (err instanceof Error) {
+            //         await webhook.send({
+            //             text: JSON.stringify(err.message)
+            //         })
+            //     }
+            // }
+            return res.status(200).json({
+                "response_action": "clear"
+            })
         }
         res.status(200)
     } else {
