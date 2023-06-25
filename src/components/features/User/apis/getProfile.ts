@@ -1,7 +1,7 @@
 import client from '@/lib/axios'
 import { IUser } from '../types'
 
-export const getProfile = (id?: string) => {
+export const getProfile = async (id?: string) => {
     if (!id) return null
-    return client.get<IUser>(`/api/users/${id}`)
+    return await client.get<IUser>(`/api/users/${id}`)
 }
