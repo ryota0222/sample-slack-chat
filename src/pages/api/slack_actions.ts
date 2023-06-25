@@ -20,10 +20,10 @@ export default async function handler(
     webhook.send({
         text: `
 token: ${token}
-actions: ${actions}
-container: ${container}
+actions: ${JSON.stringify(actions)}
+container: ${JSON.stringify(container)}
 view: ${view}
-message: ${message}
+message: ${JSON.stringify(message)}
 `
     })
     if (req.method === 'POST') {
