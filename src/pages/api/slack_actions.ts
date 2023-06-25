@@ -26,11 +26,13 @@ export default async function handler(
             // NOTE: pass!
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
+            const userDocRef = db.collection('users').doc('sample')
             void docRef.set({
                 text: view.state.values['replay-message']['plain_text_input-action'].value !== undefined ? view.state.values['replay-message']['plain_text_input-action'].value : "",
                 createdAt: new Date(),
                 uid: 'sample',
-                to: ''
+                to: '',
+                user: userDocRef
             });
             // NOTE: pass!
             const args = {
