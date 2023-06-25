@@ -23,9 +23,7 @@ export default async function handler(
             };
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
-            await webhook.send({
-                text: 'send1'
-            })
+            // NOTE: pass!
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
             void docRef.set({
@@ -34,18 +32,16 @@ export default async function handler(
                 uid: 'sample',
                 to: ''
             });
-            await webhook.send({
-                text: 'send2'
-            })
+            // NOTE: pass!
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
-                user_id: user.id,
+                view_id: view.id,
                 view: MODAL_COMPLETE_TEMPLATE
             };
             await webhook.send({
                 text: JSON.stringify(args)
             })
-            await axios.post(`${SLACK_API_URL}/views.publish`, qs.stringify(args));
+            await axios.post(`${SLACK_API_URL}/views.update`, qs.stringify(args));
         }
         res.status(200)
     } else {
