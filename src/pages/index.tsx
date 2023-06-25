@@ -13,7 +13,7 @@ const Home = () => {
     <main className={`flex flex-col items-center px-24 ${inter.className}`}>
       {/* ローディング中 */}
       {status === "loading" && (
-        <div className="w-full py-12">
+        <div className="w-full py-12 flex justify-center">
           <Loader />
         </div>
       )}
