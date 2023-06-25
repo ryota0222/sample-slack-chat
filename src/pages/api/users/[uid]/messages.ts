@@ -16,7 +16,7 @@ export default async function handler(
         return res.status(400).send('ユーザー情報の取得に失敗しました')
     }
     if (req.method === 'GET') {
-        const querySnapshot = await db.collection('messages').orderBy('createdAt', 'desc').where('uid', '==', userId).get();
+        const querySnapshot = await db.collection('messages').orderBy('createdAt', 'desc').where('uid', 'in', [userId, 'sample']).get();
         const data = await Promise.all(querySnapshot.docs.map(async doc => {
             const message = doc.data() as IMessage
             const fromUserDoc = await (message.from as any).get()

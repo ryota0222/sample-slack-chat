@@ -20,19 +20,7 @@ export default async function handler(
     if (req.method === 'POST') {
         if (actions &&
             actions[0].action_id.indexOf(PATTERN) === 0) {
-                await webhook.send({
-                    text: `
-                    ${JSON.stringify(JSON.parse(req.body.payload))}
-                    `
-                })
             const uid = actions[0].action_id.slice(PATTERN.length)
-            await webhook.send({
-                text: `
-+++++++++++++++++++++++++++++++
-    uid: ${uid}
-+++++++++++++++++++++++++++++++
-                `
-            })
             const args = {
                 token: process.env.SLACK_BOT_TOKEN,
                 trigger_id: trigger_id,
@@ -40,7 +28,6 @@ export default async function handler(
             };
             await axios.post(`${SLACK_API_URL}/views.open`, qs.stringify(args));
         } else if (type === 'view_submission') {
-            // NOTE: pass!
             const {uid} = JSON.parse(view.private_metadata)
             const db = firebaseAdmin.firestore()
             const docRef = db.collection('messages').doc();
